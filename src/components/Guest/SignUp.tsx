@@ -1,14 +1,16 @@
 import {useState} from "react";
+import {registerUser} from "../../features/api/accountApi.ts";
+import {useAppDispatch} from "../../app/hooks.ts";
 
 const SignUp = () => {
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const dispatch = useAppDispatch();
 
     const handleClickSignUp = () => {
-        //TODO sign up
-        alert(`Sign in ${login} ${password} ${firstName} ${lastName}`);
+       dispatch(registerUser({login, password, firstName, lastName}))
     }
 
     const handleClickClear = () => {

@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {UpdateMode} from '../../utils/types.d';
-import EditProfile from "../EditProfile.tsx";
+import EditProfile from "./EditProfile.tsx";
 import ChangePassword from "./ChangePassword.tsx";
 
 const UpdateUser = () => {

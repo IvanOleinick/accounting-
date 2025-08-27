@@ -1,6 +1,7 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import type {UserRegister} from "../../utils/types";
+import type {UserData, UserRegister} from "../../utils/types";
 import {base_url, createToken} from "../../utils/constans.ts";
+import type {RootState} from "../../app/store.ts";
 
 export const registerUser = createAsyncThunk(
     'user/register',
@@ -18,9 +19,74 @@ export const registerUser = createAsyncThunk(
         if (!response.ok) {
             throw new Error(`Something went wrong`)
         }
-        const data=await response.json()
-        const token=createToken(user.login,user.password)
-        return {user:data,token};
+        const data = await response.json()
+        const token = createToken(user.login, user.password)
+        return {user: data, token};
 
+    }
+)
+
+
+export const fetchUser = createAsyncThunk(
+    'user/fetch',
+    async (token: string) => {
+        const response = await fetch(`${base_url}/account/login`, {
+            method: 'Post',
+            headers: {
+                Authorization: token,
+            }
+        });
+        if (response.status === 401) {
+            throw new Error(`Login or password incorrect`)
+        }
+        if (!response.ok) {
+            throw new Error(`Something went wrong`)
+        }
+        const data = await response.json()
+        return {user: data, token}
+    }
+)
+
+export const updateUser =
+    createAsyncThunk<UserData, UserData, { state: RootState }>(
+        'user/update',
+        async (user, {getState}) => {
+            const response = await fetch(`${base_url}/account/user/${getState().user.login}`, {
+                method: 'PATH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: getState().token
+                },
+                body: JSON.stringify(user)
+            })
+            if (response.status === 401) {
+                throw new Error(`Login or password incorrect`)
+            }
+            if (!response.ok) {
+                throw new Error(`Something went wrong`)
+            }
+            const {firstName, lastName} = await response.json()
+            return {firstName, lastName}
+        }
+    )
+
+export const changePassword = createAsyncThunk<string, string, { state: RootState }>(
+    'user/password',
+    async (newPassword: string, {getState}) => {
+        const response = await fetch(`${base_url}/account/password`, {
+            method: 'PATH',
+            headers: {
+                Authorization: getState().token,
+                'X-Password': newPassword
+            }
+        })
+
+        if (response.status === 401) {
+            throw new Error(`Login or password incorrect`)
+        }
+        if (!response.ok) {
+            throw new Error(`Something went wrong`)
+        }
+        return createToken(getState().user.login, newPassword)
     }
 )

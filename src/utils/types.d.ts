@@ -16,5 +16,4 @@ export interface UserProfile extends UserData{
 export interface UserRegister extends UserData{
     login: string,
     password: string,
-
 }
